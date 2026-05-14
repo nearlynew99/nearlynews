@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>nearly.news — Passions, not algorithms.</title>
+<meta name="description" content="Passions, not algorithms. Clean news, no ads, built around what you actually care about. $5 is $5.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:        #0f0d0a;
+    --ink-soft:   #1a1612;
+    --paper:      #f5f0e8;
+    --cream:      #faf7f2;
+    --orange:     #e85d04;
+    --orange-dim: #b84a03;
+    --teal:       #1a6b5a;
+    --mid:        #4a3f2f;
+    --light:      #9a8f7f;
+    --rule:       #d5cfc4;
+    --rule-dark:  #2a2018;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Libre Baskerville', Georgia, serif;
+    overflow-x: hidden;
+  }
+
+  /* ── Masthead ── */
+  .masthead {
+    background: var(--ink);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--orange);
+  }
+  .masthead-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .logo-mark { width: 36px; height: 36px; flex-shrink: 0; }
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .logo-text .w { color: var(--paper); }
+  .logo-text .o { color: var(--orange); }
+
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .nav-links a {
+    color: var(--light);
+    text-decoration: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--paper); }
+  .nav-cta {
+    background: var(--orange) !important;
+    color: white !important;
+    padding: 8px 18px;
+    border-radius: 3px;
+  }
+  .nav-cta:hover { background: var(--orange-dim) !important; }
+
+  /* ── Hero ── */
+  .hero {
+    background: var(--ink);
+    padding: 100px 32px 90px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 28px,
+      rgba(255,255,255,0.012) 28px, rgba(255,255,255,0.012) 29px
+    );
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+  .hero-left { }
+  .hero-kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.5s 0.1s forwards;
+  }
+  .hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 6vw, 80px);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -0.025em;
+    color: var(--paper);
+    margin-bottom: 0;
+    opacity: 0;
+    animation: fadeUp 0.5s 0.2s forwards;
+  }
+  .hero-headline em {
+    color: var(--orange);
+    font-style: italic;
+  }
+  .hero-rule {
+    width: 60px;
+    height: 3px;
+    background: var(--orange);
+    margin: 28px 0;
+    opacity: 0;
+    animation: fadeUp 0.5s 0.3s forwards;
+  }
+  .hero-sub {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--light);
+    max-width: 480px;
+    opacity: 0;
+    animation: fadeUp 0.5s 0.4s forwards;
+  }
+  .hero-sub strong { color: var(--paper); font-weight: 700; }
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+    opacity: 0;
+    animation: fadeUp 0.5s 0.5s forwards;
+  }
+  .btn-primary {
+    background: var(--orange);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--orange-dim); transform: translateY(-1px); }
+  .btn-ghost {
+    color: var(--light);
+    padding: 14px 22px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+  .btn-ghost:hover { color: var(--paper); border-color: rgba(255,255,255,0.3); }
+
+  /* Hero right — three pillars */
+  .hero-right {
+    opacity: 0;
+    animation: fadeUp 0.5s 0.4s forwards;
+  }
+  .pillar {
+    padding: 28px 0;
+    border-bottom: 1px solid var(--rule-dark);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .pillar:first-child { border-top: 1px solid var(--rule-dark); }
+  .pillar-word {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    font-style: italic;
+    color: var(--orange);
+    min-width: 100px;
+    line-height: 1;
+    padding-top: 3px;
+  }
+  .pillar-body {
+    font-size: 14px;
+    color: var(--light);
+    line-height: 1.75;
+  }
+  .pillar-body strong { color: var(--paper); font-weight: 700; display: block; margin-bottom: 4px; font-style: normal; font-size: 15px; }
+
+  /* ── Ticker ── */
+  .ticker {
+    background: var(--orange);
+    padding: 9px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker-inner {
+    display: inline-block;
+    animation: ticker 28s linear infinite;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: white;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
+
+  /* ── Manifesto ── */
+  .manifesto {
+    background: var(--ink);
+    padding: 80px 32px;
+  }
+  .manifesto-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .manifesto-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 3.5vw, 38px);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--paper);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+  .manifesto-quote em { color: var(--orange); font-style: normal; font-weight: 700; }
+  .manifesto-attr {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--rule-dark);
+    text-transform: uppercase;
+    margin-top: 28px;
+  }
+
+  /* ── Section wrapper ── */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 80px 32px;
+  }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+    max-width: 60px;
+  }
+  .rule { border: none; border-top: 2px solid var(--ink); margin: 0 32px; }
+  .rule-light { border: none; border-top: 1px solid var(--rule); margin: 0 32px; }
+
+  /* ── How it works ── */
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid var(--rule);
+    margin-top: 48px;
+  }
+  .how-card {
+    padding: 36px 28px;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+  .how-card:last-child { border-right: none; }
+  .how-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 900;
+    font-style: italic;
+    color: var(--orange);
+    opacity: 0.15;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .how-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+  .how-body {
+    font-size: 14px;
+    color: var(--mid);
+    line-height: 1.75;
+  }
+
+  /* ── Sources ── */
+  .sources-bg { background: var(--ink); padding: 64px 0; }
+  .sources-inner { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+  .sources-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+  .sources-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--paper);
+    margin-bottom: 6px;
+  }
+  .sources-sub {
+    font-size: 14px;
+    color: var(--light);
+    margin-bottom: 36px;
+    font-style: italic;
+  }
+  .sources-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .source-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--light);
+    border: 1px solid var(--rule-dark);
+    padding: 6px 14px;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .source-pill:hover { color: var(--paper); border-color: var(--orange); }
+
+  /* ── No Ads statement ── */
+  .no-ads-bg { background: var(--orange); padding: 56px 32px; text-align: center; }
+  .no-ads-inner { max-width: 700px; margin: 0 auto; }
+  .no-ads-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 900;
+    font-style: italic;
+    color: white;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .no-ads-body {
+    font-size: 16px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.7;
+    margin-bottom: 0;
+  }
+
+  /* ── Pricing ── */
+  .pricing-section { background: var(--cream); }
+  .pricing-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--ink);
+    max-width: 500px;
+  }
+  .pricing-headline em { color: var(--orange); font-style: italic; }
+  .pricing-sub {
+    font-size: 16px;
+    color: var(--mid);
+    margin-top: 16px;
+    font-style: italic;
+    max-width: 420px;
+    line-height: 1.65;
+  }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 52px;
+  }
+  .plan {
+    border: 1px solid var(--rule);
+    padding: 36px 30px;
+    position: relative;
+    background: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .plan:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.08); }
+  .plan-featured {
+    border-color: var(--orange);
+    border-width: 2px;
+  }
+  .plan-badge {
+    position: absolute;
+    top: -13px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--orange);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    white-space: nowrap;
+  }
+  .plan-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--light);
+    margin-bottom: 16px;
+    font-style: normal;
+  }
+  .plan-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .plan-price span {
+    font-size: 28px;
+    color: var(--orange);
+    font-weight: 700;
+    vertical-align: super;
+    margin-right: 2px;
+  }
+  .plan-price-free {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-style: italic;
+  }
+  .plan-period {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--light);
+    text-transform: uppercase;
+    margin: 8px 0 24px;
+  }
+  .plan-divider {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 20px 0;
+  }
+  .plan-features {
+    list-style: none;
+    padding: 0;
+  }
+  .plan-features li {
+    font-size: 13px;
+    color: var(--mid);
+    padding: 6px 0 6px 20px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .plan-features li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--orange);
+    font-weight: 700;
+  }
+  .plan-features li.muted { color: var(--rule); }
+  .plan-features li.muted::before { color: var(--rule); }
+  .plan-cta {
+    margin-top: 28px;
+    display: block;
+    text-align: center;
+    padding: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 3px;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+  .plan-cta-primary { background: var(--orange); color: white; }
+  .plan-cta-primary:hover { background: var(--orange-dim); }
+  .plan-cta-ghost { border: 1px solid var(--rule); color: var(--mid); background: none; }
+  .plan-cta-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* Pricing note */
+  .pricing-note {
+    text-align: center;
+    margin-top: 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--light);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── Modes ── */
+  .modes-bg { background: var(--ink); padding: 80px 0; }
+  .modes-inner { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+  .modes-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+    margin-bottom: 48px;
+  }
+  .modes-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 900;
+    color: var(--paper);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .modes-headline em { color: var(--orange); font-style: italic; }
+  .modes-body {
+    font-size: 15px;
+    color: var(--light);
+    line-height: 1.8;
+    padding-top: 6px;
+  }
+  .modes-body strong { color: var(--paper); }
+  .modes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+  }
+  .mode-card {
+    padding: 28px 22px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+  .mode-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--mode-color, var(--orange));
+    transform: scaleX(0);
+    transition: transform 0.25s;
+    transform-origin: left;
+  }
+  .mode-card:hover { background: rgba(255,255,255,0.05); }
+  .mode-card:hover::after { transform: scaleX(1); }
+  .mode-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--paper);
+    margin-bottom: 10px;
+  }
+  .mode-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.65;
+    margin-bottom: 14px;
+  }
+  .mode-example {
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    font-style: italic;
+    line-height: 1.6;
+    border-left: 2px solid var(--mode-color, var(--orange));
+    padding-left: 10px;
+  }
+
+  /* ── Final CTA ── */
+  .final-cta {
+    background: var(--ink);
+    padding: 110px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .final-cta::before {
+    content: 'clean.';
+    position: absolute;
+    font-family: 'Playfair Display', serif;
+    font-size: 220px;
+    font-weight: 900;
+    font-style: italic;
+    color: rgba(255,255,255,0.018);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: -0.04em;
+  }
+  .final-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 900;
+    color: var(--paper);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .final-headline em { color: var(--orange); font-style: italic; }
+  .final-sub {
+    font-size: 17px;
+    color: var(--light);
+    font-style: italic;
+    margin-bottom: 44px;
+    position: relative;
+    line-height: 1.6;
+  }
+  .final-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  /* ── Footer ── */
+  footer {
+    background: #080604;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .footer-wordmark {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 900;
+    font-style: italic;
+  }
+  .footer-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #2a2018;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+    .how-grid { grid-template-columns: 1fr; }
+    .how-card { border-right: none; border-bottom: 1px solid var(--rule); }
+    .pricing-grid { grid-template-columns: 1fr 1fr; max-width: 640px; }
+    .modes-intro { grid-template-columns: 1fr; gap: 24px; }
+    .modes-grid { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 560px) {
+    .modes-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Masthead ── -->
+<nav class="masthead">
+  <div class="masthead-inner">
+    <a href="/" class="logo">
+      <!-- Circle N mark -->
+      <svg class="logo-mark" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="18" fill="#e85d04"/>
+        <text x="18" y="24" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="22" fill="#f5f0e8">n</text>
+      </svg>
+      <!-- Wordmark beside it -->
+      <div class="logo-text"><span class="w">nearly</span><span class="o">.news</span></div>
+    </a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="https://nearlynews.beehiiv.com/subscribe" target="_blank" class="nav-cta">Start Free</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-kicker">nearly.news — Charleston, SC</div>
+      <h1 class="hero-headline">The news.<br><em>Clean.</em></h1>
+      <p style="font-family:'Playfair Display',serif;font-size:clamp(18px,2.5vw,26px);font-style:italic;color:var(--orange);margin:16px 0 0;letter-spacing:-0.01em;opacity:0;animation:fadeUp 0.5s 0.3s forwards">Passions, not algorithms.</p>
+      <div class="hero-rule"></div>
+      <p class="hero-sub">
+        No ads. No algorithm deciding what you see. No opinion dressed up as fact.<br><br>
+        <strong>Real sources. Your city. Your passions. Your daily scoop.</strong><br><br>
+        You pay what you pay and you know exactly what you're getting.
+      </p>
+      <div class="hero-actions">
+        <a href="https://nearlynews.beehiiv.com/subscribe" target="_blank" class="btn-primary">Start Free →</a>
+        <a href="#how" class="btn-ghost">See How It Works</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="pillar">
+        <div class="pillar-word">Clean.</div>
+        <div class="pillar-body">
+          <strong>No ads. No spin. No algorithm.</strong>
+          Real sources only — AP, BBC, Reuters, NPR, your local paper. Deduplicated, balanced, and delivered straight.
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-word">Yours.</div>
+        <div class="pillar-body">
+          <strong>Your city. Your passions. Your daily scoop.</strong>
+          Charleston. Clemson. Celtics. Braves. Set it once and it's yours. Read it plain or with personality — same facts, different voice.
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-word">Fair.</div>
+        <div class="pillar-body">
+          <strong>$5 is $5. $10 is $10.</strong>
+          No $4.99. No hidden tiers. No "save 40% annually" math. Clean price for a clean product. If you don't love it, cancel in 10 seconds.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Ticker ── -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-inner">
+    Passions, not algorithms &nbsp;·&nbsp; Clean news &nbsp;·&nbsp; No ads &nbsp;·&nbsp; Your city &nbsp;·&nbsp; Your passions &nbsp;·&nbsp; Your daily scoop &nbsp;·&nbsp; $5 is $5 &nbsp;·&nbsp; Charleston &nbsp;·&nbsp; Clemson &nbsp;·&nbsp; The Arts &nbsp;·&nbsp; Your Teams &nbsp;·&nbsp; AP · BBC · Reuters · NPR &nbsp;·&nbsp; Passions, not algorithms &nbsp;·&nbsp; Clean news &nbsp;·&nbsp; No ads &nbsp;·&nbsp; Your city &nbsp;·&nbsp; Your passions &nbsp;·&nbsp; Your daily scoop &nbsp;·&nbsp; $5 is $5 &nbsp;·&nbsp; Charleston &nbsp;·&nbsp; Clemson &nbsp;·&nbsp; The Arts &nbsp;·&nbsp; Your Teams &nbsp;·&nbsp; AP · BBC · Reuters · NPR &nbsp;·&nbsp;
+  </div>
+</div>
+
+<!-- ── Manifesto ── -->
+<section class="manifesto">
+  <div class="manifesto-inner reveal">
+    <p class="manifesto-quote">
+      "Every morning you open three tabs just to triangulate the truth. One leans left. One leans right. One is trying to sell you something. Meanwhile an algorithm decides what matters to you. <em>Passions, not algorithms. There's a better way.</em>"
+    </p>
+    <div class="manifesto-attr">The nearly.news promise</div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ── How It Works ── -->
+<section id="how" class="section">
+  <div class="section-label">How It Works</div>
+  <div class="how-grid reveal">
+    <div class="how-card">
+      <div class="how-num">1</div>
+      <div class="how-title">We pull from across the spectrum</div>
+      <div class="how-body">AP, Reuters, BBC, NPR — not one outlet's take, all of them. Then we deduplicate, strip the spin, and surface what actually happened.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">2</div>
+      <div class="how-title">You tell us what matters to you</div>
+      <div class="how-body">Your city. Your passions. Your daily scoop. Set it once — sports, arts, music, local community, whatever drives you. We build around your life, not an algorithm's agenda.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">3</div>
+      <div class="how-title">Your Daily High / Low / Buffalo 🦬</div>
+      <div class="how-body">Plain facts or personality — your call. The same news delivered as your Daily Scoop, your Daily Tea, your Daily Biscuit. High, Low, and the one nobody saw coming. Every morning.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Sources ── -->
+<section class="sources-bg">
+  <div class="sources-inner reveal">
+    <div class="sources-label">Sources</div>
+    <h2 class="sources-headline">We read everything. You follow your passions.</h2>
+    <p class="sources-sub">Pulling from across the spectrum — left, right, center, local, and international — then giving you the facts.</p>
+    <div class="sources-row">
+      <div class="source-pill">Associated Press</div>
+      <div class="source-pill">Reuters</div>
+      <div class="source-pill">BBC</div>
+      <div class="source-pill">NPR</div>
+      <div class="source-pill">Post & Courier</div>
+      <div class="source-pill">ESPN</div>
+      <div class="source-pill">CBS Sports</div>
+      <div class="source-pill">247Sports</div>
+      <div class="source-pill">The Athletic</div>
+      <div class="source-pill">AP State Wire</div>
+      <div class="source-pill">Local TV & Radio</div>
+      <div class="source-pill">+ More daily</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── No Ads Statement ── -->
+<section class="no-ads-bg">
+  <div class="no-ads-inner reveal">
+    <h2 class="no-ads-headline">When the product is free,<br>you are the product.</h2>
+    <p class="no-ads-body">Every free news app is funded by advertisers who want your attention, your clicks, and your data. We're funded by you — and only you. That changes everything about how we make decisions.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ── Pricing ── -->
+<section id="pricing" class="section pricing-section">
+  <div class="section-label">Pricing</div>
+  <h2 class="pricing-headline reveal">Clean price.<br><em>No tricks.</em></h2>
+  <p class="pricing-sub reveal">No $4.99. No "save 40% annually" math. No feature confusion. You know what you're paying and you know what you're getting.</p>
+
+  <div class="pricing-grid reveal">
+
+    <!-- Free -->
+    <div class="plan">
+      <div class="plan-name">Free</div>
+      <div class="plan-price-free">Free.</div>
+      <div class="plan-period">Always. No card required.</div>
+      <hr class="plan-divider">
+      <ul class="plan-features">
+        <li>National &amp; world headlines</li>
+        <li>Plain delivery mode</li>
+        <li>5 stories per feed</li>
+        <li>Drill into any story</li>
+        <li class="muted">Personality modes</li>
+        <li class="muted">Local &amp; sports feeds</li>
+        <li class="muted">Custom feeds</li>
+      </ul>
+      <a href="https://nearlynews.beehiiv.com/subscribe" target="_blank" class="plan-cta plan-cta-ghost">Get Started</a>
+    </div>
+
+    <!-- Reader $5 -->
+    <div class="plan plan-featured">
+      <div class="plan-badge">Most Popular</div>
+      <div class="plan-name">Reader</div>
+      <div class="plan-price"><span>$</span>5</div>
+      <div class="plan-period">per month. $5 is $5.</div>
+      <hr class="plan-divider">
+      <ul class="plan-features">
+        <li>Everything in Free</li>
+        <li>All 5 news categories</li>
+        <li>All 4 personality modes</li>
+        <li>Sports tabs — all your teams</li>
+        <li>15 stories per feed</li>
+        <li>Full drill-in to source</li>
+        <li class="muted">Custom city &amp; feeds</li>
+      </ul>
+      <a href="https://nearlynews.beehiiv.com/subscribe" target="_blank" class="plan-cta plan-cta-primary">Start Free Trial →</a>
+    </div>
+
+    <!-- Local+ $10 -->
+    <div class="plan">
+      <div class="plan-name">Local+</div>
+      <div class="plan-price"><span>$</span>10</div>
+      <div class="plan-period">per month. $10 is $10.</div>
+      <hr class="plan-divider">
+      <ul class="plan-features">
+        <li>Everything in Reader</li>
+        <li>Your city, hardwired</li>
+        <li>Custom team roster</li>
+        <li>Morning digest by 7am</li>
+        <li>Early access to features</li>
+        <li>Priority support</li>
+        <li class="muted">Custom feed subscriptions</li>
+      </ul>
+      <a href="https://nearlynews.beehiiv.com/subscribe" target="_blank" class="plan-cta plan-cta-ghost">Get Local+</a>
+    </div>
+
+    <!-- Superfan $20 -->
+    <div class="plan" style="border-color: #c0a020; background: #0f0d0a; color: #f5f0e8;">
+      <div class="plan-badge" style="background: #c0a020;">Superfan ★</div>
+      <div class="plan-name" style="color: #c0a020;">Superfan</div>
+      <div class="plan-price" style="color: #f5f0e8;"><span style="color:#c0a020;">$</span>20</div>
+      <div class="plan-period" style="color: #6a6050;">per month. $20 is $20.</div>
+      <hr class="plan-divider" style="border-color: #2a2018;">
+      <ul class="plan-features">
+        <li style="color: #c0b898;">Everything in Local+</li>
+        <li style="color: #c0b898;">Unlimited custom feeds</li>
+        <li style="color: #c0b898;">Bring your own subscriptions</li>
+        <li style="color: #c0b898;">Tiger Illustrated, The Athletic, any RSS</li>
+        <li style="color: #c0b898;">One unified morning read</li>
+        <li style="color: #c0b898;">Personality modes on every feed</li>
+        <li style="color: #c0b898;">We don't own your news. We just make it better to read.</li>
+      </ul>
+      <a href="https://nearlynews.beehiiv.com/subscribe" target="_blank" class="plan-cta" style="background:#c0a020;color:#0f0d0a;margin-top:28px;display:block;text-align:center;padding:12px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;border-radius:3px;">Become a Superfan →</a>
+    </div>
+
+  </div>
+
+  <div class="pricing-note reveal">No annual contracts. No confusing tiers. Cancel anytime in under 10 seconds.</div>
+</section>
+
+<hr class="rule-light">
+
+<!-- ── Personality Modes ── -->
+<section class="modes-bg">
+  <div class="modes-inner">
+    <div class="modes-intro reveal">
+      <h2 class="modes-headline">Same facts.<br><em>Your voice.</em></h2>
+      <p class="modes-body">
+        The news doesn't change. <strong>How you receive it can.</strong><br><br>
+        Choose your delivery style each morning. The facts are always intact — we just change the tone. Because sometimes you want the straight story, and sometimes the world has earned a little side-eye.
+      </p>
+    </div>
+    <div class="modes-grid reveal">
+      <div class="mode-card" style="--mode-color: #8a8a7a;">
+        <div class="mode-name">Plain</div>
+        <div class="mode-desc">Just the facts. Clean, sourced, balanced. Nothing added, nothing removed.</div>
+        <div class="mode-example">"The Fed held rates steady at its May meeting, citing mixed signals on inflation."</div>
+      </div>
+      <div class="mode-card" style="--mode-color: #e8a04a;">
+        <div class="mode-name">Witty</div>
+        <div class="mode-desc">A clever friend texting you the news. Light, warm, factually intact.</div>
+        <div class="mode-example">"The Fed did its best 'not it' impression again. Economists nodded along like they called it."</div>
+      </div>
+      <div class="mode-card" style="--mode-color: #a04a8a;">
+        <div class="mode-name">Snarky</div>
+        <div class="mode-desc">Dry, world-weary, accurate. For when the news has earned the eye-roll.</div>
+        <div class="mode-example">"In a development that surprised no one, rates remain unchanged. The committee continues to exist."</div>
+      </div>
+      <div class="mode-card" style="--mode-color: #1a6b5a;">
+        <div class="mode-name">Southern</div>
+        <div class="mode-desc">Warm, folksy, colorful. Like a Charleston neighbor over sweet tea.</div>
+        <div class="mode-example">"Well bless their hearts up at the Fed — left things right where they were. Lord willing."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Final CTA ── -->
+<section class="final-cta">
+  <h2 class="final-headline reveal">Stop triangulating.<br><em>Start reading.</em></h2>
+  <p class="final-sub reveal">Clean news. No ads. You guide it.<br>Built around your passions — not an algorithm's agenda.<br>Free to start. $5 if you love it. $10 if you want it built around you. $20 if you want to bring everything you already read.</p>
+  <div class="final-actions reveal">
+    <a href="https://nearlynews.beehiiv.com/subscribe" target="_blank" class="btn-primary" style="font-size:13px;padding:16px 36px;">Get Started — It's Free</a>
+    <a href="#how" class="btn-ghost">See how it works ↑</a>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="footer-logo">
+    <svg style="width:26px;height:26px;flex-shrink:0" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="100" rx="14" fill="#1a1612"/>
+      <rect width="100" height="4" rx="2" fill="#e85d04"/>
+      <circle cx="50" cy="48" r="28" fill="#e85d04"/>
+      <text x="50" y="58" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="36" fill="#f5f0e8">n</text>
+    </svg>
+    <span class="footer-wordmark"><span style="color:#f5f0e8">nearly</span><span style="color:#e85d04">news</span></span>
+  </div>
+  <div class="footer-note">Passions, not algorithms.</div>
+  <div class="footer-note">Charleston, SC · nearly.news · 2025</div>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  reveals.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
