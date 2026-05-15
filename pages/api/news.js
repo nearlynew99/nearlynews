@@ -5,6 +5,17 @@ After searching the web, return ONLY a valid JSON array — no markdown, no back
 Format: [{"headline":"...","summary":"...","source":"..."}]
 Rules: exactly 5 items, summary 2-3 sentences max, neutral language, no HTML in values.`;
 
+const HLB_SYSTEM_PROMPT = `You are the nearly.news Daily Digest (High / Low / Buffalo).
+Search the web for TODAY's real news. Pick exactly 3 distinct current stories:
+- HIGH (slot "high", emoji 🌟): the most uplifting OR most important story of the day
+- LOW (slot "low", emoji 📉): the hardest truth of the day
+- BUFFALO (slot "buffalo", emoji 🦬): the most unexpected story nobody saw coming
+Return ONLY a valid JSON array — no markdown, no backticks, no preamble:
+[{"slot":"high","label":"High","emoji":"🌟","headline":"...","summary":"2-3 factual sentences","source":"outlet name"},
+ {"slot":"low","label":"Low","emoji":"📉","headline":"...","summary":"...","source":"..."},
+ {"slot":"buffalo","label":"Buffalo","emoji":"🦬","headline":"...","summary":"...","source":"..."}]
+Exactly 3 items. Neutral factual language unless the user requests a personality voice. No HTML in values.`;
+
 const REWRITE_SYSTEM =
   "You rewrite news with a distinct, obvious personality voice while keeping every fact intact. Follow the user's style instructions fully — never default to neutral wire-service tone. Return only the requested JSON.";
 
@@ -18,12 +29,14 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { query, personality } = req.body || {};
+  const { query, personality, digest } = req.body || {};
   if (!query || typeof query !== "string") {
     return res.status(400).json({ error: "Missing or invalid query" });
   }
 
+  const isDigest = digest === true;
   const isRewrite =
+    !isDigest &&
     personality &&
     typeof personality === "object" &&
     typeof personality.prompt === "string" &&
@@ -33,7 +46,9 @@ export default async function handler(req, res) {
     ? personality.id === "southern"
       ? SOUTHERN_REWRITE_SYSTEM
       : REWRITE_SYSTEM
-    : SYSTEM_PROMPT;
+    : isDigest
+      ? HLB_SYSTEM_PROMPT
+      : SYSTEM_PROMPT;
   const useSearch = !isRewrite;
   const userContent = isRewrite ? `${personality.prompt}\n\n${query}` : query;
 

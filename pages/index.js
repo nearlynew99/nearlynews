@@ -13,8 +13,28 @@ const C = {
   ruleL:   "#d5cfc4",
 };
 
+// ── Daily Digest (High / Low / Buffalo) ─────────────────────
+const DIGEST_NAMES = {
+  plain:    "Daily Scoop",
+  witty:    "Daily Dish",
+  snarky:   "Daily Tea",
+  southern: "Daily Biscuit",
+  british:  "Daily Dispatch",
+};
+
+function getDigestName(personalityId) {
+  return DIGEST_NAMES[personalityId] || DIGEST_NAMES.plain;
+}
+
+const HLB_SLOTS = [
+  { slot: "high",    label: "High",    emoji: "🌟", color: "#c9a227" },
+  { slot: "low",     label: "Low",     emoji: "📉", color: "#6a7a9a" },
+  { slot: "buffalo", label: "Buffalo", emoji: "🦬", color: "#9a6b4a" },
+];
+
 // ── Categories ────────────────────────────────────────────────
 const CATEGORIES = [
+  { id: "hlb",           label: "HLB",        icon: "🦬", color: "#c47a1a", isHLB: true },
   { id: "local",         label: "Charleston", icon: "⚓", color: "#1a6b5a" },
   { id: "state",         label: "S. Carolina", icon: "🌴", color: "#2d5a8e" },
   { id: "national",      label: "National",   icon: "🇺🇸", color: "#c47a1a" },
@@ -58,11 +78,11 @@ const SUGGESTED_FEEDS = [
 ];
 
 // ── News API (Anthropic via /api/news) ──────────────────────────
-async function callNewsApi(query, personality = null) {
+async function callNewsApi(query, personality = null, { digest = false } = {}) {
   const res = await fetch("/api/news", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query, personality }),
+    body: JSON.stringify({ query, personality, digest }),
   });
   const raw = await res.text();
   let data;
@@ -95,6 +115,38 @@ Find 5 current real stories. Return ONLY this JSON array:
     null
   );
   return parseJSON(text);
+}
+
+function parseHLB(text) {
+  const arr = parseJSON(text);
+  return HLB_SLOTS.map((meta, i) => {
+    const item = arr.find((x) => x.slot === meta.slot) || arr[i];
+    if (!item?.headline) throw new Error("Incomplete digest response");
+    return {
+      ...meta,
+      headline: item.headline,
+      summary: item.summary || "",
+      source: item.source || "News",
+    };
+  });
+}
+
+function buildHLBQuery(personality) {
+  let q = `Search the web RIGHT NOW for today's top news worldwide.
+Identify exactly 3 distinct real stories as:
+🌟 HIGH — the most uplifting OR most important story of the day
+📉 LOW — the hardest truth of the day
+🦬 BUFFALO — the most unexpected story nobody saw coming
+Return exactly 3 items with slots "high", "low", and "buffalo".`;
+  if (personality?.prompt) {
+    q += `\n\nWrite every headline and summary in this voice (keep all facts accurate):\n${personality.prompt}`;
+  }
+  return q;
+}
+
+async function fetchHLB(personality) {
+  const text = await callNewsApi(buildHLBQuery(personality), null, { digest: true });
+  return parseHLB(text);
 }
 
 async function fetchCustomFeed(feed) {
@@ -155,6 +207,34 @@ function Spinner({ color }) {
   );
 }
 
+function HLBCard({ item, onOpen }) {
+  const story = { ...item, hlbSlot: item.slot, hlbLabel: item.label, hlbEmoji: item.emoji };
+  return (
+    <div
+      onClick={() => onOpen(story)}
+      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderLeft: `4px solid ${item.color}`, borderRadius: "8px", padding: "18px 20px", marginBottom: "14px", cursor: "pointer", transition: "background 0.15s" }}
+      onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
+      onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.03)"}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+        <span style={{ fontSize: "22px", lineHeight: 1 }}>{item.emoji}</span>
+        <span style={{ fontSize: "11px", fontFamily: "monospace", letterSpacing: "0.16em", textTransform: "uppercase", color: item.color, fontWeight: 700 }}>{item.label}</span>
+      </div>
+      <div style={{ fontSize: "15px", fontWeight: "700", color: "#e8e0d0", lineHeight: "1.45", fontFamily: "Georgia,serif", marginBottom: "8px" }}>
+        {item.headline}
+      </div>
+      {item.summary && (
+        <div style={{ fontSize: "13px", color: C.light, lineHeight: "1.75", marginBottom: "10px" }}>
+          {item.summary.length > 280 ? item.summary.slice(0, 280) + "…" : item.summary}
+        </div>
+      )}
+      <div style={{ fontSize: "10px", fontFamily: "monospace", letterSpacing: "0.05em", textTransform: "uppercase", color: C.rule }}>
+        {item.source} · tap to read
+      </div>
+    </div>
+  );
+}
+
 function NewsCard({ story, color, onOpen }) {
   return (
     <div
@@ -194,6 +274,12 @@ function StoryModal({ story, personality, color, onClose }) {
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
       <div onClick={e => e.stopPropagation()} style={{ background: C.inkSoft, border: "1px solid rgba(255,255,255,0.1)", borderTop: `3px solid ${color}`, borderRadius: "10px", maxWidth: "580px", width: "100%", padding: "28px", maxHeight: "88vh", overflowY: "auto" }}>
+        {display.hlbEmoji && (
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+            <span style={{ fontSize: "20px" }}>{display.hlbEmoji}</span>
+            <span style={{ fontSize: "10px", fontFamily: "monospace", letterSpacing: "0.16em", textTransform: "uppercase", color }}>{display.hlbLabel}</span>
+          </div>
+        )}
         <div style={{ fontSize: "10px", color: C.light, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "12px", fontFamily: "monospace" }}>{display.source}</div>
         <div style={{ fontSize: "18px", fontWeight: "700", color: "#e8e0d0", lineHeight: "1.45", marginBottom: "14px", fontFamily: "Georgia,serif" }}>{display.headline}</div>
         <div style={{ fontSize: "14px", color: C.light, lineHeight: "1.8", marginBottom: "24px" }}>{display.summary}</div>
@@ -436,7 +522,7 @@ function CustomFeedView({ feeds, onManage, onOpenStory, color }) {
 
 // ── Main App ──────────────────────────────────────────────────
 export default function NearlyNews() {
-  const [activeCatId,   setActiveCatId]   = useState("national");
+  const [activeCatId,   setActiveCatId]   = useState("hlb");
   const [activeSportId, setActiveSportId] = useState("clemson");
   const [personality,   setPersonality]   = useState(PERSONALITIES[0]);
   const [showPicker,    setShowPicker]    = useState(false);
@@ -453,10 +539,12 @@ export default function NearlyNews() {
 
   const activeCat   = CATEGORIES.find(c => c.id === activeCatId);
   const activeSport = SPORT_SUBS.find(s => s.id === activeSportId);
-  const isCustom    = activeCat.isCustom;
-  const feedKey     = activeCat.hasSubs ? activeSportId : activeCatId;
-  const activeColor = isCustom ? "#c0a020" : activeCat.hasSubs ? activeSport.color : activeCat.color;
-  const activeLabel = isCustom ? "My Feeds" : activeCat.hasSubs ? activeSport.label : activeCat.label;
+  const isHLB       = activeCat?.isHLB;
+  const isCustom    = activeCat?.isCustom;
+  const digestName  = getDigestName(personality.id);
+  const feedKey     = isHLB ? `hlb-${personality.id}` : activeCat?.hasSubs ? activeSportId : activeCatId;
+  const activeColor = isCustom ? "#c0a020" : isHLB ? activeCat.color : activeCat?.hasSubs ? activeSport.color : activeCat?.color;
+  const activeLabel = isCustom ? "My Feeds" : isHLB ? digestName : activeCat?.hasSubs ? activeSport.label : activeCat?.label;
   const stories     = cacheRef.current[feedKey] || [];
   const updated     = updatedRef.current[feedKey];
 
@@ -471,7 +559,7 @@ export default function NearlyNews() {
     if (!force && cacheRef.current[key]?.length && age < 12 * 60 * 1000) return;
     setLoading(true); setError(null);
     try {
-      const items = await fetchNews(getQuery());
+      const items = isHLB ? await fetchHLB(personality) : await fetchNews(getQuery());
       cacheRef.current[key] = items;
       updatedRef.current[key] = Date.now();
     } catch (e) {
@@ -484,6 +572,7 @@ export default function NearlyNews() {
 
   useEffect(() => { if (!initRef.current) { initRef.current = true; load(); } }, []);
   useEffect(() => { if (initRef.current && !isCustom) load(); }, [activeCatId, activeSportId]);
+  useEffect(() => { if (initRef.current && isHLB) load(); }, [personality.id]);
 
   function addFeed(feed) {
     setCustomFeeds(prev => [...prev.filter(f => f.url !== feed.url), feed]);
@@ -550,7 +639,7 @@ export default function NearlyNews() {
               <button key={cat.id} onClick={() => { setActiveCatId(cat.id); setShowPicker(false); if (cat.isCustom) setShowFeeds(false); }}
                 style={{ background: "none", border: "none", borderBottom: isActive ? `2px solid ${col}` : "2px solid transparent", padding: "11px 15px 9px", color: isActive ? "#e8e0d0" : "#4a4035", fontSize: "11px", fontFamily: "monospace", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", transition: "color 0.15s", display: "flex", alignItems: "center", gap: "5px" }}>
                 <span style={{ fontSize: "13px" }}>{cat.icon}</span>
-                {cat.label}
+                {cat.isHLB ? digestName : cat.label}
                 {cat.isCustom && customFeeds.length > 0 && (
                   <span style={{ background: `${cat.color}25`, color: cat.color, fontSize: "9px", padding: "1px 5px", borderRadius: "8px" }}>{customFeeds.length}</span>
                 )}
@@ -577,8 +666,48 @@ export default function NearlyNews() {
         <CustomFeedView feeds={customFeeds} onManage={() => setShowFeeds(true)} onOpenStory={setOpenStory} color="#c0a020"/>
       )}
 
+      {/* ── High / Low / Buffalo Digest ── */}
+      {isHLB && (
+        <div style={{ padding: "18px 20px", maxWidth: "680px", margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: activeColor, display: "inline-block", boxShadow: `0 0 6px ${activeColor}`, animation: loading ? "pulse 1s infinite" : "none" }}/>
+              <span style={{ fontSize: "10px", color: "#4a4035", letterSpacing: "0.14em", textTransform: "uppercase", fontFamily: "monospace" }}>
+                Your {digestName}
+                {updated && !loading && <span style={{ color: "#3a3028", marginLeft: "8px" }}>· {timeAgo(updated)}</span>}
+              </span>
+            </div>
+            <button onClick={() => load(true)} disabled={loading}
+              style={{ background: "none", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "4px", color: loading ? "#3a3028" : "#5a5045", fontSize: "10px", padding: "3px 10px", cursor: loading ? "not-allowed" : "pointer", fontFamily: "monospace", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+              {loading ? "loading…" : "↻ refresh"}
+            </button>
+          </div>
+          <div style={{ fontSize: "11px", color: C.light, fontFamily: "monospace", letterSpacing: "0.06em", marginBottom: "18px", opacity: 0.85 }}>
+            🌟 High · 📉 Low · 🦬 Buffalo — today's three stories that matter
+          </div>
+
+          {loading && <Spinner color={activeColor}/>}
+
+          {!loading && error && (
+            <div style={{ background: "rgba(180,50,50,0.1)", border: "1px solid rgba(180,50,50,0.25)", borderRadius: "7px", padding: "16px 18px", color: "#c08080", lineHeight: 1.65 }}>
+              <div style={{ fontWeight: 700, marginBottom: "6px", fontSize: "13px" }}>Couldn't load your {digestName}</div>
+              <div style={{ fontSize: "11px", opacity: 0.7, fontFamily: "monospace", marginBottom: "12px", wordBreak: "break-all" }}>{error}</div>
+              <button onClick={() => load(true)} style={{ background: "rgba(180,50,50,0.2)", border: "none", borderRadius: "4px", color: "#d09090", padding: "6px 14px", fontSize: "11px", fontFamily: "monospace", cursor: "pointer", letterSpacing: "0.06em", textTransform: "uppercase" }}>Try Again</button>
+            </div>
+          )}
+
+          {!loading && !error && stories.length > 0 && (
+            <div style={{ animation: "fadeUp 0.35s ease" }}>
+              {stories.map((item) => (
+                <HLBCard key={item.slot} item={item} onOpen={setOpenStory}/>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Standard Feed View ── */}
-      {!isCustom && (
+      {!isCustom && !isHLB && (
         <div style={{ padding: "18px 20px", maxWidth: "680px", margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -632,7 +761,7 @@ export default function NearlyNews() {
       </div>
 
       {/* ── Modals ── */}
-      {openStory && <StoryModal story={openStory} personality={personality} color={activeColor} onClose={() => setOpenStory(null)}/>}
+      {openStory && <StoryModal story={openStory} personality={personality} color={openStory.color || activeColor} onClose={() => setOpenStory(null)}/>}
       {showFeeds && <CustomFeedsPanel feeds={customFeeds} onAdd={addFeed} onRemove={removeFeed} onClose={() => setShowFeeds(false)}/>}
     </div>
   );
