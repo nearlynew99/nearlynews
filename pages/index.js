@@ -211,6 +211,7 @@ function Spinner({ color }) {
 }
 
 function HLBCard({ item, onOpen }) {
+  const [reasonRevealed, setReasonRevealed] = useState(false);
   const story = { ...item, hlbSlot: item.slot, hlbLabel: item.label, hlbEmoji: item.emoji };
   return (
     <div
@@ -224,9 +225,21 @@ function HLBCard({ item, onOpen }) {
         <span style={{ fontSize: "11px", fontFamily: "monospace", letterSpacing: "0.16em", textTransform: "uppercase", color: item.color, fontWeight: 700 }}>{item.label}</span>
       </div>
       {item.slot === "buffalo" && item.buffalo_reason && (
-        <div style={{ fontSize: "12px", color: C.light, lineHeight: "1.6", fontFamily: "Georgia,serif", fontStyle: "italic", marginBottom: "10px", opacity: 0.9 }}>
-          <span style={{ fontStyle: "normal", fontFamily: "monospace", fontSize: "9px", letterSpacing: "0.08em", textTransform: "uppercase", color: item.color, opacity: 0.85 }}>Why it&apos;s the buffalo: </span>
-          {item.buffalo_reason}
+        <div style={{ marginBottom: "10px" }} onClick={e => e.stopPropagation()}>
+          {!reasonRevealed ? (
+            <button
+              type="button"
+              onClick={() => setReasonRevealed(true)}
+              style={{ background: "rgba(154,107,74,0.12)", border: "1px dashed rgba(154,107,74,0.35)", borderRadius: "5px", padding: "8px 12px", width: "100%", textAlign: "left", cursor: "pointer", fontSize: "11px", fontFamily: "monospace", letterSpacing: "0.04em", color: item.color, lineHeight: 1.5 }}
+            >
+              Why is this the buffalo? 🦬 tap to reveal
+            </button>
+          ) : (
+            <div className="buffalo-reveal" style={{ fontSize: "12px", color: C.light, lineHeight: "1.6", fontFamily: "Georgia,serif", fontStyle: "italic", opacity: 0.9 }}>
+              <span style={{ fontStyle: "normal", fontFamily: "monospace", fontSize: "9px", letterSpacing: "0.08em", textTransform: "uppercase", color: item.color, opacity: 0.85 }}>Why it&apos;s the buffalo: </span>
+              {item.buffalo_reason}
+            </div>
+          )}
         </div>
       )}
       <div style={{ fontSize: "15px", fontWeight: "700", color: "#e8e0d0", lineHeight: "1.45", fontFamily: "Georgia,serif", marginBottom: "8px" }}>
@@ -596,6 +609,8 @@ export default function NearlyNews() {
         @keyframes spin   { to{transform:rotate(360deg)} }
         @keyframes pulse  { 0%,100%{opacity:1} 50%{opacity:0.3} }
         @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+        @keyframes buffaloReveal { from{opacity:0;transform:translateY(-6px);max-height:0} to{opacity:1;transform:none;max-height:200px} }
+        .buffalo-reveal { animation: buffaloReveal 0.4s ease forwards; overflow: hidden; }
         * { box-sizing:border-box; }
         ::-webkit-scrollbar { width:3px; height:3px; }
         ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08); border-radius:2px; }
