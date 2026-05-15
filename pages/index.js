@@ -358,7 +358,7 @@ function CustomFeedsPanel({ feeds, onAdd, onRemove, onClose }) {
 }
 
 // ── Custom Feed Sub-tabs ──────────────────────────────────────
-function CustomFeedView({ feeds, onManage, color }) {
+function CustomFeedView({ feeds, onManage, onOpenStory, color }) {
   const [activeFeed, setActiveFeed]   = useState(feeds[0] || null);
   const [loading,    setLoading]      = useState(false);
   const [error,      setError]        = useState(null);
@@ -426,7 +426,7 @@ function CustomFeedView({ feeds, onManage, color }) {
           </div>
         )}
         {!loading && !error && stories.map((s, i) => (
-          <NewsCard key={i} story={s} color="#c0a020" onOpen={() => {}}/>
+          <NewsCard key={i} story={s} color="#c0a020" onOpen={onOpenStory}/>
         ))}
       </div>
     </div>
@@ -573,7 +573,7 @@ export default function NearlyNews() {
 
       {/* ── Custom Feeds View ── */}
       {isCustom && (
-        <CustomFeedView feeds={customFeeds} onManage={() => setShowFeeds(true)} color="#c0a020"/>
+        <CustomFeedView feeds={customFeeds} onManage={() => setShowFeeds(true)} onOpenStory={setOpenStory} color="#c0a020"/>
       )}
 
       {/* ── Standard Feed View ── */}
