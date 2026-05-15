@@ -6,7 +6,12 @@ Format: [{"headline":"...","summary":"...","source":"..."}]
 Rules: exactly 5 items, summary 2-3 sentences max, neutral language, no HTML in values.`;
 
 const REWRITE_SYSTEM =
-  "You rewrite news with personality while keeping all facts intact. Return only the requested JSON.";
+  "You rewrite news with a distinct, obvious personality voice while keeping every fact intact. Follow the user's style instructions fully — never default to neutral wire-service tone. Return only the requested JSON.";
+
+const SOUTHERN_REWRITE_SYSTEM = `You rewrite news in an unmistakable warm Southern voice — like a friendly neighbor telling stories over the back fence with sweet tea in hand.
+Use y'all, honey, bless their heart, reckon, ain't, and gentle storytelling rhythm. Be colorful and unhurried; paint the scene, don't read bullet points.
+Never sound like plain factual reporting or a wire service. Every headline and summary must feel distinctly Southern.
+Keep all facts accurate and unchanged. Return only the requested JSON.`;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -24,7 +29,11 @@ export default async function handler(req, res) {
     typeof personality.prompt === "string" &&
     personality.prompt.length > 0;
 
-  const system = isRewrite ? REWRITE_SYSTEM : SYSTEM_PROMPT;
+  const system = isRewrite
+    ? personality.id === "southern"
+      ? SOUTHERN_REWRITE_SYSTEM
+      : REWRITE_SYSTEM
+    : SYSTEM_PROMPT;
   const useSearch = !isRewrite;
   const userContent = isRewrite ? `${personality.prompt}\n\n${query}` : query;
 

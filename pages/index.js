@@ -43,7 +43,8 @@ const PERSONALITIES = [
   { id: "plain",    label: "Plain",    icon: "📰", desc: "Just the facts",    prompt: null },
   { id: "witty",    label: "Witty",    icon: "😄", desc: "Light & clever",    prompt: "Rewrite with light, clever wit — like a funny friend texting the news. Keep all facts intact. Return ONLY JSON: {\"headline\":\"...\",\"summary\":\"...\"}" },
   { id: "snarky",   label: "Snarky",   icon: "😏", desc: "Dry eye-roll",      prompt: "Rewrite with dry, world-weary snark. Subtle eye-rolls, facts only. Return ONLY JSON: {\"headline\":\"...\",\"summary\":\"...\"}" },
-  { id: "southern", label: "Southern", icon: "🌿", desc: "Bless their heart", prompt: "Rewrite in warm, folksy Southern style — colorful, maybe a 'bless their heart'. Facts intact. Return ONLY JSON: {\"headline\":\"...\",\"summary\":\"...\"}" },
+  { id: "southern", label: "Southern", icon: "🌿", desc: "Sweet tea & y'all", prompt: "Rewrite this news like a friendly Southern neighbor leaning over the picket fence with sweet tea in hand — warm, unhurried, storytelling charm. Use a genuine Southern voice throughout: y'all, honey, bless their heart (kind or gently exasperated), reckon, ain't, fit to be tied, porch-swing cadence, and colorful asides. Paint the scene; don't just list facts like a wire report. Headline and summary must feel unmistakably Southern — never dry, neutral, or Plain-mode flat. Keep every fact accurate and unchanged. Return ONLY JSON: {\"headline\":\"...\",\"summary\":\"...\"}" },
+  { id: "british",  label: "British",  icon: "🎩", desc: "Your Daily Dispatch", prompt: "Rewrite in dry British wit — understated, proper, slightly sardonic, as if reporting for the BBC after a long day. Your Daily Dispatch. Keep all facts intact. Return ONLY JSON: {\"headline\":\"...\",\"summary\":\"...\"}" },
 ];
 
 // Suggested feeds for quick-add
