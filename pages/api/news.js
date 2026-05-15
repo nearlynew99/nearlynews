@@ -49,6 +49,10 @@ export default async function handler(req, res) {
       .join("");
   }
 
+  function stripCiteTags(text) {
+    return text.replace(/<cite[^>]*>/g, "").replace(/<\/cite>/g, "");
+  }
+
   try {
     for (let turn = 0; turn < 8; turn++) {
       const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -77,7 +81,7 @@ export default async function handler(req, res) {
 
       // Finished (including truncated output with usable text).
       if (stop === "end_turn" || stop === "max_tokens") {
-        return res.status(200).json({ text });
+        return res.status(200).json({ text: stripCiteTags(text) });
       }
 
       // Web search is a server tool: the API may pause mid-turn; continue with
@@ -102,14 +106,14 @@ export default async function handler(req, res) {
         continue;
       }
 
-      if (text) return res.status(200).json({ text });
+      if (text) return res.status(200).json({ text: stripCiteTags(text) });
       break;
     }
 
     for (let i = messages.length - 1; i >= 0; i--) {
       if (messages[i].role === "assistant") {
         const fallback = assistantText(messages[i].content);
-        if (fallback) return res.status(200).json({ text: fallback });
+        if (fallback) return res.status(200).json({ text: stripCiteTags(fallback) });
         break;
       }
     }
