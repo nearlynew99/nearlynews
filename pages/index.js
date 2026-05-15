@@ -127,6 +127,9 @@ function parseHLB(text) {
       headline: item.headline,
       summary: item.summary || "",
       source: item.source || "News",
+      ...(meta.slot === "buffalo" && item.buffalo_reason
+        ? { buffalo_reason: item.buffalo_reason }
+        : {}),
     };
   });
 }
@@ -136,8 +139,8 @@ function buildHLBQuery(personality) {
 Identify exactly 3 distinct real stories as:
 🌟 HIGH — the most uplifting OR most important story of the day
 📉 LOW — the hardest truth of the day
-🦬 BUFFALO — the most unexpected story nobody saw coming
-Return exactly 3 items with slots "high", "low", and "buffalo".`;
+🦬 BUFFALO — surprising, weird, unexpectedly heartwarming, or "wait, WHAT?" with wonder (curious/delighted, not sad; no disaster death tolls or grim tragedies)
+Return exactly 3 items with slots "high", "low", and "buffalo". The buffalo item must include buffalo_reason: one punchy sentence on the wonder or "wait, WHAT?" factor.`;
   if (personality?.prompt) {
     q += `\n\nWrite every headline and summary in this voice (keep all facts accurate):\n${personality.prompt}`;
   }
@@ -220,6 +223,12 @@ function HLBCard({ item, onOpen }) {
         <span style={{ fontSize: "22px", lineHeight: 1 }}>{item.emoji}</span>
         <span style={{ fontSize: "11px", fontFamily: "monospace", letterSpacing: "0.16em", textTransform: "uppercase", color: item.color, fontWeight: 700 }}>{item.label}</span>
       </div>
+      {item.slot === "buffalo" && item.buffalo_reason && (
+        <div style={{ fontSize: "12px", color: C.light, lineHeight: "1.6", fontFamily: "Georgia,serif", fontStyle: "italic", marginBottom: "10px", opacity: 0.9 }}>
+          <span style={{ fontStyle: "normal", fontFamily: "monospace", fontSize: "9px", letterSpacing: "0.08em", textTransform: "uppercase", color: item.color, opacity: 0.85 }}>Why it&apos;s the buffalo: </span>
+          {item.buffalo_reason}
+        </div>
+      )}
       <div style={{ fontSize: "15px", fontWeight: "700", color: "#e8e0d0", lineHeight: "1.45", fontFamily: "Georgia,serif", marginBottom: "8px" }}>
         {item.headline}
       </div>
